@@ -1,29 +1,43 @@
-module dummy_token::my_coin;
+module dummy_token::my_coin {
+    use std::option::{Self, Option};
+    use sui::url::{Self, Url};
+    use sui::tx_context::TxContext;
+    use sui::coin::{Self, TreasuryCap, CoinMetadata};
+    use sui::transfer;
 
-use sui::coin::{Self, TreasuryCap};
+    /// The type identifier of MY_COIN cryptocurrency
+    struct MY_COIN has drop {}
 
-public struct MY_COIN has drop {}
+    /// Module initializer is called once on module publish.
+    fun init(witness: MY_COIN, ctx: &mut TxContext) {
+        // Define the coin metadata with image URL
+        let (treasury, metadata) = coin::create_currency(
+            witness,
+            6, // decimals
+            b"TK1", // symbol
+            b"Token1", // name
+            b"Test Token 1", // description
+            option::some(url::new_unsafe_from_bytes(b"https://your-token-image-url.com/image.png")), // icon url
+            ctx
+        );
 
-fun init(witness: MY_COIN, ctx: &mut TxContext) {
-		let (treasury, metadata) = coin::create_currency(
-				witness,
-				6,
-				b"TK1",
-                b"Token1", 
-                b"Test Token 1",
-				option::none(),
-				ctx,
-		);
-		transfer::public_freeze_object(metadata);
-		transfer::public_transfer(treasury, ctx.sender())
-}
+        transfer::public_freeze_object(metadata);
+        transfer::public_transfer(treasury, ctx.sender())
+    }
 
-public fun mint(
-		treasury_cap: &mut TreasuryCap<MY_COIN>,
-		amount: u64,
-		recipient: address,
-		ctx: &mut TxContext,
-) {
-		let coin = coin::mint(treasury_cap, amount, ctx);
-		transfer::public_transfer(coin, recipient)
+    /// Manager can mint new coins
+    public fun mint(
+        treasury_cap: &mut TreasuryCap<MY_COIN>,
+        amount: u64,
+        recipient: address,
+        ctx: &mut TxContext,
+    ) {
+        let coin = coin::mint(treasury_cap, amount, ctx);
+        transfer::public_transfer(coin, recipient)
+    }
+
+    /// Returns the URL of the token's icon
+    public fun icon_url(metadata: &CoinMetadata<MY_COIN>): Option<Url> {
+        coin::get_icon_url(metadata)
+    }
 }
