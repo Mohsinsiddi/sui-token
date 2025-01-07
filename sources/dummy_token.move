@@ -6,7 +6,7 @@ module dummy_token::my_coin {
     use sui::transfer;
 
     /// The type identifier of MY_COIN cryptocurrency
-    struct MY_COIN has drop {}
+    public struct MY_COIN has drop {}
 
     /// Module initializer is called once on module publish.
     fun init(witness: MY_COIN, ctx: &mut TxContext) {
@@ -17,7 +17,7 @@ module dummy_token::my_coin {
             b"TK1", // symbol
             b"Token1", // name
             b"Test Token 1", // description
-            option::some(url::new_unsafe_from_bytes(b"https://your-token-image-url.com/image.png")), // icon url
+            option::some(url::new_unsafe_from_bytes(b"https://image.binance.vision/editor-uploads-original/9c15d9647b9643dfbc5e522299d13593.png")), // icon url
             ctx
         );
 
